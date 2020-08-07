@@ -31,7 +31,7 @@
           </v-card>
         </v-form>
       </v-dialog>
-      <v-btn @click="toggleTable">Show Todos</v-btn>
+      <v-btn @click="toggleTable">{{ getTableStatus }} Todos</v-btn>
     </div>
     <v-simple-table v-if="showTable">
       <template v-slot:default>
@@ -47,15 +47,15 @@
           <tr
             v-for="todo in allTodos"
             :key="todo.id"
-            class="white--text text-lighten-1"
+            class="white--text text-lighten-1 text-center"
             :class="todo.completed ? 'success' : 'warning'"
           >
             <td>{{ todo.id }}</td>
             <td>{{ todo.todo }}</td>
             <td>{{ todo.completed ? "Completed" : "Not Completed" }}</td>
             <td class="d-flex justify-space-around align-center">
-              <v-btn small @click="todoCompleted(todo)">Mark as Completed</v-btn>
-              <v-btn small @click="todoUncompleted(todo)">Mark as Uncompleted</v-btn>
+              <v-btn v-if="!todo.completed" small @click="todoCompleted(todo)">Mark as Completed</v-btn>
+              <v-btn v-if="todo.completed" small @click="todoUncompleted(todo)">Mark as Uncompleted</v-btn>
               <v-btn small @click="todoDeleted(todo)">Delete Todo</v-btn>
             </td>
           </tr>
@@ -66,21 +66,19 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapState, mapActions, mapGetters, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      todos: [],
+      ...mapState(["todos"]),
       todoOperations: ["Completed", "Uncompleted"],
       dialog: false,
       showTable: true,
-      formData: {
-        todo: "",
-        completed: "",
-      },
+      formData: { todo: "", completed: "" },
     };
   },
   methods: {
+    ...mapMutations(),
     ...mapActions([
       "todoCreated",
       "todoCompleted",
@@ -97,14 +95,9 @@ export default {
     },
   },
   computed: {
-    allTodos() {
-      return this.$store.getters.allTodos;
-    },
-    completedTodos() {
-      return this.$store.getters.completedTodos;
-    },
-    completedTodosCount() {
-      return this.$store.getters.completedTodosCount;
+    ...mapGetters(["allTodos", "completedTodos", "completedTodosCount"]),
+    getTableStatus() {
+      return this.showTable ? "HIDE" : "SHOW";
     },
   },
   watch: {},
