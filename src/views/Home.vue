@@ -1,67 +1,46 @@
 <template>
   <div>
-    <div class="d-flex justify-space-around">
-      <v-dialog v-model="dialog" width="500">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="red lighten-2" dark v-bind="attrs" v-on="on">New Todo</v-btn>
-        </template>
-        <v-form @submit="submitTodo">
-          <v-card>
-            <v-card-title class="headline grey lighten-2">New Todo</v-card-title>
-            <v-card-text>
-              <v-text-field v-model="formData.todo" label="Type todo" required></v-text-field>
-              <v-radio-group v-model="formData.completed">
-                <v-radio
-                  v-for="operation in todoOperations"
-                  :key="operation"
-                  :label="operation"
-                  :value="operation"
-                ></v-radio>
-              </v-radio-group>
-            </v-card-text>
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-btn
-                block
-                class="blue text--white text-lighten-1"
-                text
-                @click="submitTodo(); dialog = false;"
-              >I accept</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-form>
-      </v-dialog>
-      <v-btn @click="toggleTable">{{ getTableStatus }} Todos</v-btn>
+    <v-row class="mx-0 d-flex justify-space-around">
+      <v-btn class="amber" v-if="!openForm" @click="openForm = !openForm">Create New Todo</v-btn>
+      <v-btn class="amber" v-if="openForm" @click="openForm = !openForm">X</v-btn>
+    </v-row>
+    <div class="mt-5" v-show="openForm">
+      <v-form @submit="submitTodo">
+        <v-row>
+          <v-text-field v-model="formData.todo" label="Type Todo" class="mx-0"></v-text-field>
+        </v-row>
+        <v-radio-group v-model="formData.completed" class="d-flex justify-space-around">
+          <v-radio
+            v-for="operation in todoOperations"
+            :key="operation"
+            :label="operation"
+            :value="operation"
+          ></v-radio>
+        </v-radio-group>
+        <v-btn block type="submit" @click.prevent="submitTodo">Create</v-btn>
+      </v-form>
     </div>
-    <v-simple-table v-if="showTable">
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th class="text-center">Id</th>
-            <th class="text-center">Todo</th>
-            <th class="text-center">Is completed ?</th>
-            <th class="text-center">Operations</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="todo in allTodos"
-            :key="todo.id"
-            class="white--text text-lighten-1 text-center"
-            :class="todo.completed ? 'success' : 'warning'"
-          >
-            <td>{{ todo.id }}</td>
-            <td>{{ todo.todo }}</td>
-            <td>{{ todo.completed ? "Completed" : "Not Completed" }}</td>
-            <td class="d-flex justify-space-around align-center">
-              <v-btn v-if="!todo.completed" small @click="todoCompleted(todo)">Mark as Completed</v-btn>
-              <v-btn v-if="todo.completed" small @click="todoUncompleted(todo)">Mark as Uncompleted</v-btn>
-              <v-btn small @click="todoDeleted(todo)">Delete Todo</v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
+
+    <v-row class="my-5 mx-0 teal text-center">
+      <v-col>Todo Id</v-col>
+      <v-col>Todo Content</v-col>
+      <v-col>Todo Operations</v-col>
+    </v-row>
+    <v-row
+      no-gutters
+      v-for="todo in allTodos"
+      :key="todo.id"
+      class="pa-3 mb-3 text-center"
+      :class="todo.completed ? 'success' : 'warning'"
+    >
+      <v-col>{{ todo.id }}</v-col>
+      <v-col>{{ todo.todo }}</v-col>
+      <v-col class="d-flex justify-space-around">
+        <v-btn v-if="!todo.completed" small @click="todoCompleted(todo)">Mark as Completed</v-btn>
+        <v-btn v-if="todo.completed" small @click="todoUncompleted(todo)">Mark as Uncompleted</v-btn>
+        <v-btn small @click="todoDeleted(todo)">Delete Todo</v-btn>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -71,9 +50,9 @@ export default {
   data() {
     return {
       ...mapState(["todos"]),
+      todoIdOrder: true, // false => asc, true => desc
+      openForm: false,
       todoOperations: ["Completed", "Uncompleted"],
-      dialog: false,
-      showTable: true,
       formData: { todo: "", completed: "" },
     };
   },
@@ -96,9 +75,6 @@ export default {
   },
   computed: {
     ...mapGetters(["allTodos", "completedTodos", "completedTodosCount"]),
-    getTableStatus() {
-      return this.showTable ? "HIDE" : "SHOW";
-    },
   },
   watch: {},
 };

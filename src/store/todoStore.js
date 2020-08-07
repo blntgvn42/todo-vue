@@ -37,12 +37,19 @@ export default {
   getters: {
     allTodos: state => {
       return state.todos
+      //
     },
     completedTodos: state => {
       return state.todos.filter(todo => todo.completed)
     },
     completedTodosCount: (state, getters) => {
       return getters.completedTodos.length
+    },
+    getTodosAscOrder: () => {
+      return this.allTodos.sort((todo1, todo2) => todo1.id > todo2.id ? 1 : -1)
+    },
+    getTodosDescOrder: () => {
+      return this.allTodos.sort((todo1, todo2) => todo1.id > todo2.id ? -1 : 1)
     }
   },
   actions: {
