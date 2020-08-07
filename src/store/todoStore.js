@@ -44,12 +44,6 @@ export default {
     },
     completedTodosCount: (state, getters) => {
       return getters.completedTodos.length
-    },
-    getTodosAscOrder: () => {
-      return this.allTodos.sort((todo1, todo2) => todo1.id > todo2.id ? 1 : -1)
-    },
-    getTodosDescOrder: () => {
-      return this.allTodos.sort((todo1, todo2) => todo1.id > todo2.id ? -1 : 1)
     }
   },
   actions: {
